@@ -1,22 +1,15 @@
-import { useState, useRef, useContext } from 'react';
+import { useState, useRef } from 'react';
 
 import classes from './SignUpPage.module.css';
-import AuthContext from '../../store/auth-context';
+import { Navigate } from 'react-router-dom';
 
 
-
-
-const SignUpPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
+const SignUp = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
   const [isLoading, setIsLoading] = useState(false);
+  const [redirect, setRedirect] = useState(false);
 
-  const authCtx = useContext(AuthContext);
-
-  const switchAuthModeHandler = () => {
-    setIsLogin((prevState) => !prevState);
-  };
 
   const formHandler = (event) => {
     event.preventDefault();
@@ -24,16 +17,8 @@ const SignUpPage = () => {
     const enteredPassword = passwordRef.current.value;
 
     setIsLoading(true);
-    let url;
-    if(isLogin){
-       url = 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBlDCY3JTlp5pDcM5MHo29QouMsk-f9MOU';
-       
-
-    }else{
-       url = 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBlDCY3JTlp5pDcM5MHo29QouMsk-f9MOU';
       
-    }
-    fetch(url,
+    fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBlDCY3JTlp5pDcM5MHo29QouMsk-f9MOU',
       {
         method: 'POST',
         body: JSON.stringify({
@@ -52,28 +37,27 @@ const SignUpPage = () => {
       } else {
         return res.json().then((data) => {
           let errorMessage = 'Auth failed!';
-          // if(data && data.error && data.error.message){
-          //   errorMessage = data.error.message;
-          // }
+           if(data && data.error && data.error.message){
+           errorMessage = data.error.message;
+          }
           throw new Error(errorMessage);
         })
       }
     }).then((data) => {
       console.log(data);
-      authCtx.login(data.idToken);
-      localStorage.setItem('idToken',data.idToken);
+      setRedirect(true);
     })
     .catch((err) => {
       alert(err.message);
     })
-
-
-
   };
+  if (redirect) {
+    return <Navigate to="/Login"></Navigate>;
+  }
 
   return (
     <section className={classes.auth}>
-      <h1>{isLogin ? 'Sign In' : 'Sign Up'}</h1>
+      <h1>Sign Up</h1>
       <form onSubmit={formHandler} >
         <div className={classes.control}>
           <label htmlFor='email'>Your Email</label>
@@ -89,7 +73,7 @@ const SignUpPage = () => {
           />
         </div>
 
-        {!isLogin && <div className={classes.control}>
+        <div className={classes.control}>
           <label htmlFor='password'> Confirm Your Password</label>
           <input
             type='password'
@@ -97,22 +81,16 @@ const SignUpPage = () => {
             required
             ref={passwordRef}
           />
-        </div>}
-
+        </div>
+  
 
         <div className={classes.actions}>
-         {!isLoading &&  <button>{isLogin ? 'Login' :'Create Account'}</button>}
+         {!isLoading &&  <button>Create Account</button>}
          {isLoading && <p>Sending request...</p>}
-          <button
-            type='button'
-            className={classes.toggle}
-            onClick={switchAuthModeHandler}
-          >
-            {isLogin ? 'SignUp' : 'Login'}
-          </button>
+
         </div>
       </form>
     </section>
   );
 };
-export default SignUpPage;
+export default SignUp;

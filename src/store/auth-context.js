@@ -21,7 +21,6 @@ const AuthContext = React.createContext({
 
     const loginHandler = (token) => {
      setToken(token);
-      localStorage.setItem('idToken', token);
     }
 
      const logoutHandler = () => {
