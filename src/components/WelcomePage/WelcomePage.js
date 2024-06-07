@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import classes from './WelcomePage.module.css';
 
 const WelcomePage = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [isLoggedOut, setIsLoggedOut] = useState(false); // New state for handling logout
 
   const token = localStorage.getItem('token');
+
+  const logoutHandler = () => {
+    localStorage.removeItem('token');
+    setIsLoggedOut(true); // Set logout state to true
+  };
   
   const buttonHandler = () => {
     if (!token) {
@@ -41,9 +47,14 @@ const WelcomePage = () => {
       setError(err.message);
     });
   };
-
+ 
+  if(isLoggedOut){
+    return <Navigate to="/Login"/>
+  };
+  
   return (
     <div className={classes.container}>
+      <button className={classes.newbutton} onClick={logoutHandler}>Logout</button>
       <p>Welcome to ExpenseTracker... !</p>
       <button onClick={buttonHandler}>Verify Email</button>
       {message && <p >{message}</p>}
