@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import classes from './Login.module.css';
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 
 const Login = () => {
@@ -71,6 +71,7 @@ const Login = () => {
           />
         </div>
 
+         <Link to='/Password'>Forget Password....</Link>
         <div className={classes.actions}>
          {!isLoading &&  <button>Login</button>}
          {isLoading && <p>Sending request...</p>}

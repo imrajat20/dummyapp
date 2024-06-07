@@ -4,6 +4,7 @@ import WelcomePage from './components/WelcomePage/WelcomePage';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/Login/Login';
 import Profile from './components/Profile/Profile';
+import Password from './components/PasswordReset/Password';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/" element={<SignUp />} />
         <Route path='/Profile' element={<Profile/>}/>
+        <Route path='/Password' element={<Password/>}/>
       </Routes>
     </Router>
   );
