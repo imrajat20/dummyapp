@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/Login/Login';
 import Profile from './components/Profile/Profile';
 import Password from './components/PasswordReset/Password';
+import ExpenseForm from './components/ExpenseForm/ExpenseForm';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<SignUp />} />
         <Route path='/Profile' element={<Profile/>}/>
         <Route path='/Password' element={<Password/>}/>
+        <Route path='/ExpenseForm' element={<ExpenseForm/>}/>
       </Routes>
     </Router>
   );

@@ -59,6 +59,7 @@ const WelcomePage = () => {
       <button onClick={buttonHandler}>Verify Email</button>
       {message && <p >{message}</p>}
       {error && <p >{error}</p>}
+      <h2><Link to='/ExpenseForm'> Daily Expenses</Link></h2>
       <p>Your profile is incomplete. <Link to='/Profile'>Complete Now</Link></p>
     </div>
   );
