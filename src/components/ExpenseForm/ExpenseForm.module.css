@@ -36,7 +36,7 @@ input:focus, select:focus {
   outline: none;
 }
 
-button {
+.button {
   background-color: #3498db;
   color: white;
   padding: 12px 24px;
@@ -54,4 +54,10 @@ button {
   max-width: 400px;
   margin: 20px auto;
   font-family: 'Roboto', sans-serif;
+}
+.new{
+  background-color: azure;
+  color: black;
+  padding: 3%;
+  transition: all;
 }
