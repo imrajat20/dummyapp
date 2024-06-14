@@ -6,8 +6,11 @@ import Login from './components/Login/Login';
 import Profile from './components/Profile/Profile';
 import Password from './components/PasswordReset/Password';
 import ExpenseForm from './components/ExpenseForm/ExpenseForm';
+import { useSelector } from 'react-redux';
 
 function App() {
+  const token = useSelector(state => state.auth.token);
+  console.log('token',token);
   return (
     <Router>
       <Routes>

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import classes from './WelcomePage.module.css';
+import { useDispatch } from "react-redux";
+import { authAction } from "../../store/authSlice";
 
 const WelcomePage = () => {
   const [message, setMessage] = useState('');
@@ -8,9 +10,12 @@ const WelcomePage = () => {
   const [isLoggedOut, setIsLoggedOut] = useState(false); // New state for handling logout
 
   const token = localStorage.getItem('token');
+  const dispatch = useDispatch();
 
   const logoutHandler = () => {
     localStorage.removeItem('token');
+    dispatch(authAction.logout());
+    dispatch(authAction.setToken(''));
     setIsLoggedOut(true); // Set logout state to true
   };
   

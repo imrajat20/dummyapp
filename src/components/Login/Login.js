@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react';
 import classes from './Login.module.css';
 import { Link, Navigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { authAction } from '../../store/authSlice';
 
 
 const Login = () => {
@@ -8,6 +10,8 @@ const Login = () => {
   const passwordRef = useRef();
   const [isLoading, setIsLoading] = useState(false);
   const [redirect, setRedirect] = useState(false);
+
+  const dispatch = useDispatch();
 
   const formHandler = (event) => {
     event.preventDefault();
@@ -40,6 +44,8 @@ const Login = () => {
         })
       }
     }).then((data) => {
+      dispatch(authAction.login());
+      dispatch(authAction.setToken(data.idToken));
       localStorage.setItem("token", (data.idToken));
       setRedirect(true);
       

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import classes from './ExpenseForm.module.css';
+import { useDispatch, useSelector } from "react-redux";
+import { expenseActions } from "../../store/expenseSlice";
 
 const firebaseUrl = 'https://ecommerce-web-c8b78-default-rtdb.firebaseio.com/expenses';
 
@@ -8,9 +10,13 @@ const ExpenseForm = () => {
   const [cost, setCost] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  const [expenses, setExpenses] = useState([]);
+  // const [expenses, setExpenses] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
+
+  const dispatch = useDispatch();
+  const expenses = useSelector(state => state.expense.expenses);
+  const showPremiumButton = useSelector(state => state.expense.showPremiumButton);
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -18,14 +24,15 @@ const ExpenseForm = () => {
         const response = await axios.get(`${firebaseUrl}.json`);
         const data = response.data;
         const loadedExpenses = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
-        setExpenses(loadedExpenses);
+        // setExpenses(loadedExpenses);
+        dispatch(expenseActions.setExpenses(loadedExpenses));
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
     };
 
     fetchExpenses();
-  }, []);
+  }, [dispatch]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -34,13 +41,13 @@ const ExpenseForm = () => {
     try {
       if (isEditing) {
         await axios.put(`${firebaseUrl}/${editingId}.json`, newExpense);
-        setExpenses(expenses.map(expense => expense.id === editingId ? { id: editingId, ...newExpense } : expense));
+        dispatch(expenseActions.setExpenses(expenses.map(expense => expense.id === editingId ? { id: editingId, ...newExpense } : expense)))
         setIsEditing(false);
         setEditingId(null);
       } else {
         const response = await axios.post(`${firebaseUrl}.json`, newExpense);
         const newExpenseWithId = { id: response.data.name, ...newExpense };
-        setExpenses([...expenses, newExpenseWithId]);
+        dispatch(expenseActions.addExpense([...expenses, newExpenseWithId]));
       }
     } catch (error) {
       console.error("Error adding/updating data: ", error);
@@ -62,7 +69,7 @@ const ExpenseForm = () => {
   const deleteHandler = async (id) => {
     try {
       await axios.delete(`${firebaseUrl}/${id}.json`);
-      setExpenses(expenses.filter(expense => expense.id !== id));
+      dispatch(expenseActions.setExpenses(expenses.filter(expense => expense.id !== id)));
     } catch (error) {
       console.error("Error deleting data: ", error);
     }
@@ -109,6 +116,7 @@ const ExpenseForm = () => {
           </ul>
         )}
       </div>
+      {showPremiumButton && <button>Activate Premium</button>}
     </div>
   );
 };
