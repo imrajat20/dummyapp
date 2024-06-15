@@ -3,6 +3,8 @@ import axios from "axios";
 import classes from './ExpenseForm.module.css';
 import { useDispatch, useSelector } from "react-redux";
 import { expenseActions } from "../../store/expenseSlice";
+import { themeActions } from "../../store/themeslice";
+import { CSVLink } from "react-csv";
 
 const firebaseUrl = 'https://ecommerce-web-c8b78-default-rtdb.firebaseio.com/expenses';
 
@@ -10,13 +12,13 @@ const ExpenseForm = () => {
   const [cost, setCost] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  // const [expenses, setExpenses] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [showPremiumButton, setShowPremiumButton] = useState(false);
 
   const dispatch = useDispatch();
   const expenses = useSelector(state => state.expense.expenses);
-  const showPremiumButton = useSelector(state => state.expense.showPremiumButton);
+  const darktheme = useSelector(state => state.theme.darkMode);
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -24,7 +26,6 @@ const ExpenseForm = () => {
         const response = await axios.get(`${firebaseUrl}.json`);
         const data = response.data;
         const loadedExpenses = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
-        // setExpenses(loadedExpenses);
         dispatch(expenseActions.setExpenses(loadedExpenses));
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -34,6 +35,12 @@ const ExpenseForm = () => {
     fetchExpenses();
   }, [dispatch]);
 
+  useEffect(() => {
+    const totalCost = expenses.reduce((total, expense) => total + parseFloat(expense.cost), 0);
+    setShowPremiumButton(totalCost > 1000);
+  }, [expenses]);
+  
+
   const submitHandler = async (e) => {
     e.preventDefault();
     const newExpense = { cost, description, category };
@@ -41,7 +48,7 @@ const ExpenseForm = () => {
     try {
       if (isEditing) {
         await axios.put(`${firebaseUrl}/${editingId}.json`, newExpense);
-        dispatch(expenseActions.setExpenses(expenses.map(expense => expense.id === editingId ? { id: editingId, ...newExpense } : expense)))
+        dispatch(expenseActions.setExpenses(expenses.map(expense => expense.id === editingId ? { id: editingId, ...newExpense } : expense)));
         setIsEditing(false);
         setEditingId(null);
       } else {
@@ -74,9 +81,17 @@ const ExpenseForm = () => {
       console.error("Error deleting data: ", error);
     }
   };
+  const activatePremiumHandler = () => {
+    dispatch(themeActions.toggleTheme());
+  };
+  const csvData = expenses.map(expense => ({
+    Cost: expense.cost,
+    Description: expense.description,
+    Category: expense.category
+  }));
 
   return (
-    <div>
+    <div className={darktheme ? classes.dark : classes.light}>
       <form className={classes.form} onSubmit={submitHandler}>
         <label htmlFor="cost">Cost</label>
         <input id="cost" type="tel" value={cost} onChange={(e) => setCost(e.target.value)} required />
@@ -97,6 +112,10 @@ const ExpenseForm = () => {
           {isEditing ? 'Update Expense' : 'Add Expense'}
         </button>
       </form>
+      {showPremiumButton && <button className={classes.button} onClick={activatePremiumHandler}>Activate Premium</button>}
+      {showPremiumButton && <button className={classes.button}>
+        <CSVLink data={csvData} filename="expenses.csv">Download CSV</CSVLink>
+      </button>}
 
       <div className={classes.expensesList}>
         {expenses.length > 0 && (
@@ -116,7 +135,6 @@ const ExpenseForm = () => {
           </ul>
         )}
       </div>
-      {showPremiumButton && <button>Activate Premium</button>}
     </div>
   );
 };

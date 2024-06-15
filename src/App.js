@@ -10,7 +10,10 @@ import { useSelector } from 'react-redux';
 
 function App() {
   const token = useSelector(state => state.auth.token);
+  const showPremiumButton = useSelector(state => state.expense.showPremiumButton);
+  console.log(showPremiumButton);
   console.log('token',token);
+
   return (
     <Router>
       <Routes>

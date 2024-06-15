@@ -11,11 +11,12 @@ const expenseSlice = createSlice({
     reducers: {
         setExpenses(state, action) {
             state.expenses = action.payload;
-            state.showPremiumButton = state.expenses.reduce((total, expense) => total + expense.amount, 0) > 10000;
+            const totalAmount = state.expenses.reduce((total, expense) => total + Number(expense.cost), 0);
+            state.showPremiumButton = totalAmount > 10000;
         },
         addExpense(state, action) {
             state.expenses.push(action.payload);
-            const totalAmount = state.expenses.reduce((total, expense) => total + expense.amount, 0);
+            const totalAmount = state.expenses.reduce((total, expense) => total + Number(expense.cost), 0);
             state.showPremiumButton = totalAmount > 10000;
         }
     }
